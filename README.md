@@ -35,4 +35,4 @@ This project is licensed under the GPLv3 License - see the [LICENSE.md](LICENSE.
 * **Jordan Sherer, KN4CRD** - Creator of JS8CALL software
 * **Dan Skaggs** - Creator of [adif-parser](https://github.com/dskaggs/adif-parser/) which saved me a bunch of time
 * **Ted Miston** - Provided [TCP-Example](https://gist.github.com/tedmiston/5935757)
-* **@hacksparrow* - Provided [UDP-Example](https://www.hacksparrow.com/node-js-udp-server-and-client-example.html)
+* **@hacksparrow** - Provided [UDP-Example](https://www.hacksparrow.com/node-js-udp-server-and-client-example.html)
