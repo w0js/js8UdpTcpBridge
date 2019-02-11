@@ -22,21 +22,23 @@ var HOST = '127.0.0.1';
 
 var dgram = require('dgram');
 var udpServer = dgram.createSocket('udp4');
+var jquery = $ = require('jquery');
 
 udpServer.on('listening', function () {
     var address = udpServer.address();
-    console.log('udpServer: listening on ' + address.address + ":" + address.port);
+    $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
 });
 
 udpServer.on('message', function (rcvdMessage, remote) {
     var fjpEntryCmd = "<CMD><ACTION><VALUE>ENTER</VALUE></CMD>\r\n";
-    console.log("udpServer received: " + remote.address + ':' + remote.port +' - ' + 
-        rcvdMessage);
-    console.log("udpServer sending \"" + rcvdMessage + "\" from tcpClient.");
+    var udpRecString = "udpServer received: " + remote.address + ':' + remote.port + ' - ' +
+        rcvdMessage.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\r\n";
+    $("#udpLog").append(udpRecString);
     var parsedMessage = adifToFjp(rcvdMessage.toString());
     for( var element in parsedMessage) {
         var messageToSend = new Buffer.from(parsedMessage[element]);
         tcpClient.write(messageToSend);
+        $("#udpLog").append("udpServer: sending - " + messageToSend.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;"));
     };
     tcpClient.write(fjpEntryCmd);
 
@@ -52,7 +54,7 @@ var message = new Buffer.from(js8String);
 var udpClient = dgram.createSocket('udp4');
 udpClient.send(message, 0, message.length, udpPort, HOST, function(err, bytes) {
     if (err) throw err;
-    console.log("udpClient: \"" + message + "\" sent to " + HOST + ':' + udpPort);
+    $("#udpLog").append("udpClient: '" + message.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "' sent to " + HOST + ':' + udpPort + "\r\n");
     udpClient.close();
 });
 
@@ -71,17 +73,17 @@ tcpServer.listen(tcpPort, HOST);
 var tcpClient = new net.Socket();
 
 tcpClient.connect(tcpPort, HOST, function() {
-	console.log('tcpClient: Connected to ' + HOST + ':' + tcpPort);
+	$("#tcpLog").append('tcpClient: Connected to ' + HOST + ':' + tcpPort);
 //	tcpClient.write('Hello, server! Love, Client.');
 });
 
 tcpClient.on('data', function(data) {
-	console.log('tcpClient Received: \"' + data + "\" from tcpServer");
+	$("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
 //	tcpClient.destroy(); // kill client after server's response
 });
 
 tcpClient.on('close', function() {
-	console.log('tcpClient: Connection closed');
+	$("#tcpLog").append('tcpClient: Connection closed');
 });
 
 // ADIF parsing function
