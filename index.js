@@ -24,13 +24,14 @@ var dgram = require('dgram');
 var udpServer;// = dgram.createSocket('udp4');
 var jquery = $ = require('jquery');
 
-/*
+/* Now handled in connectBtn.click
 udpServer.on('listening', function () {
     var address = udpServer.address();
     $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
     $("#udpLog").scrollTop(999999);
 });
-
+*/
+/* Now handled in connectBtn.click
 udpServer.on('message', function (rcvdMessage, remote) {
     var fjpEntryCmd = "<CMD><ACTION><VALUE>ENTER</VALUE></CMD>\r\n";
     var ignRigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>TRUE</VALUE></CMD>\r\n";
@@ -95,16 +96,19 @@ tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
 //	tcpClient.write('Hello, server! Love, Client.');
 });
 */
-/*
+/* Now handled in connectBtn.click
 tcpClient.on('data', function(data) {
 	$("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
 //	tcpClient.destroy(); // kill client after server's response
 });
-
+*/
+/* Now handled in connectBtn.click
 tcpClient.on('close', function() {
 	$("#tcpLog").append('tcpClient: Connection closed');
 });
 */
+
+
 // ADIF parsing function
 /* License Information from github.com/dskaggs/adif-parser
  * MIT license below is applicable as commented in following function

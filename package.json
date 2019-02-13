@@ -1,6 +1,6 @@
 {
   "name": "js8UdpTcpBridge",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "N1MM+ UDP to N3FJP TCP ham radio logging bridge",
   "author": "Jonathan Straub, W0JS",
   "main": "main.js",
