@@ -17,8 +17,8 @@
 */
 
 // UDP server
-var udpPort = 2333;
-var HOST = '127.0.0.1';
+//var udpPort = 2333;
+//var udpHost = '127.0.0.1';
 
 var dgram = require('dgram');
 var udpServer = dgram.createSocket('udp4');
@@ -27,55 +27,72 @@ var jquery = $ = require('jquery');
 udpServer.on('listening', function () {
     var address = udpServer.address();
     $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
+    $("#udpLog").scrollTop(999999);
 });
 
 udpServer.on('message', function (rcvdMessage, remote) {
     var fjpEntryCmd = "<CMD><ACTION><VALUE>ENTER</VALUE></CMD>\r\n";
+    var ignRigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>TRUE</VALUE></CMD>\r\n";
+    var rigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>FALSE</VALUE></CMD>\r\n";
     var udpRecString = "udpServer received: " + remote.address + ':' + remote.port + ' - ' +
         rcvdMessage.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\r\n";
     $("#udpLog").append(udpRecString);
     var parsedMessage = adifToFjp(rcvdMessage.toString());
+    tcpClient.write(ignRigPollCmd);
+    $("#udpLog").append("udpServer: sending - " + ignRigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+    $("#udpLog").scrollTop(999999);
     for( var element in parsedMessage) {
         var messageToSend = new Buffer.from(parsedMessage[element]);
         tcpClient.write(messageToSend);
         $("#udpLog").append("udpServer: sending - " + messageToSend.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+        $("#udpLog").scrollTop(999999);
     };
     tcpClient.write(fjpEntryCmd);
-
+    $("#udpLog").scrollTop(999999);
+    tcpClient.write(rigPollCmd);
+    $("#udpLog").append("udpServer: sending - " + rigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+    $("#udpLog").scrollTop(999999);
 });
 
-udpServer.bind(udpPort, HOST);
-
-
-// UDP Client
+// UDP Client - Testing Purposes (Substitute for JS8CALL)
+/*
 var js8String = "<command:3>Log <parameters:166><Band:3>20M <Call:6>KC0NPL <Freq:6>14.078 <Mode:3>JS8 <QSO_DATE:8>20020422 <Time_ON:6>051500 <Time_OFF:6>055100 <RST_Rcvd:3>-17 <RST_Sent:3>-24 <TX_PWR:4>50.0 <EOR>";
 var message = new Buffer.from(js8String);
 
 var udpClient = dgram.createSocket('udp4');
-udpClient.send(message, 0, message.length, udpPort, HOST, function(err, bytes) {
-    if (err) throw err;
-    $("#udpLog").append("udpClient: '" + message.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "' sent to " + HOST + ':' + udpPort + "\r\n");
-    udpClient.close();
+$("#udpSendBtn").click( function() {
+    udpClient.send(message, 0, message.length, $('#udpPort').text(), $("#udpIp").text(), function(err, bytes) {
+        if (err) throw err;
+        $("#udpLog").append("udpClient: '" + message.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "' sent to " + 
+            $("#udpIp").text() + ':' + $("#udpPort").text() + "\r\n");
+        udpClient.close();
+    });
 });
+*/
 
-// TCP server
+// TCP Section
 var net = require('net');
-var tcpPort = 1337;
+
+// TCP server - Testing Purposes (Substitute for N3FJP ACLOG)
+/*
+//var tcpPort = 1100;
+//var tcpHost = '127.0.0.1';
 
 var tcpServer = net.createServer(function(socket) {
 //	socket.write('Echo server\r\n');
     socket.pipe(socket);
 });
-
-tcpServer.listen(tcpPort, HOST);
+*/
 
 // TCP Client
 var tcpClient = new net.Socket();
 
-tcpClient.connect(tcpPort, HOST, function() {
-	$("#tcpLog").append('tcpClient: Connected to ' + HOST + ':' + tcpPort);
+/* Now handled in connectBtn.click
+tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
+	$("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n");
 //	tcpClient.write('Hello, server! Love, Client.');
 });
+*/
 
 tcpClient.on('data', function(data) {
 	$("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
@@ -224,3 +241,14 @@ function adifToFjp(adifInput) {
     };
     return fjpArray;
 }
+
+// Event handler for the Connect button
+$("#connectBtn").click( function() {
+    udpServer.bind($("#udpPort").text(), $("#udpIp").text()); // start udpServer
+
+  
+//    tcpServer.listen($("#tcpPort").text(), $("#tcpIp").text()); // Start tcpServer - Testing Purposes (In place of N3FJP ACLOG)
+    tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
+        $("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n"); // Start tcpClient
+    });
+});

@@ -10,7 +10,7 @@ h4 {
 
 .taNetLog {
     width: 99%;
-    height: 200px;
+    height: 180px;
     background: #222222;
 }
 
@@ -20,4 +20,28 @@ h4 {
 
 #tcpLog {
     color: #42e422;
+}
+
+#ipDiv {
+    display: grid;
+    grid-template-columns: 10% 20% 10% 20% auto;
+    grid-template-rows: auto auto;
+}
+
+.ipEntry {
+    resize: none;
+    display: grid;
+    margin: 2px;
+    height: 1.5em;
+    margin-right: 20px;
+}
+
+.button {
+    margin: 1.5px;
+    margin-left: 40px;
+
+}
+
+#udpSendBtn {
+    grid-column-start: 2;
 }
