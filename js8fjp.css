@@ -1,0 +1,23 @@
+body {
+    background: #1f1b2c;
+}
+
+h4 {
+    color: #AAAAAA;
+    padding: 0px;
+    margin: 0px;
+}
+
+.taNetLog {
+    width: 99%;
+    height: 200px;
+    background: #222222;
+}
+
+#udpLog {
+    color: #e4e424;
+}
+
+#tcpLog {
+    color: #42e422;
+}

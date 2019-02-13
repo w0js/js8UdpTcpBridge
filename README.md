@@ -4,7 +4,6 @@ Electron App to bridge UDP messages from JS8CALL to TCP messages for N3FJP API
 ### Installing
 ```
 npm i -D electron@latest
-npm i jquery --save
 npm start
 ```
 

@@ -48,7 +48,7 @@ udpServer.bind(udpPort, HOST);
 
 
 // UDP Client
-var js8String = "<command:3>Log <parameters:165><Band:3>20M <Call:5>M4NMX <Freq:6>14.076 <Mode:3>JS8 <QSO_DATE:8>20110419 <Time_ON:6>184000 <Time_OFF:6>184500 <RST_Rcvd:3>-03 <RST_Sent:3>-07 <TX_PWR:4>20.0 <EOR>";
+var js8String = "<command:3>Log <parameters:166><Band:3>20M <Call:6>KC0NPL <Freq:6>14.078 <Mode:3>JS8 <QSO_DATE:8>20020422 <Time_ON:6>051500 <Time_OFF:6>055100 <RST_Rcvd:3>-17 <RST_Sent:3>-24 <TX_PWR:4>50.0 <EOR>";
 var message = new Buffer.from(js8String);
 
 var udpClient = dgram.createSocket('udp4');
@@ -213,6 +213,8 @@ function adifToFjp(adifInput) {
             // Populate value for textbox name if selected
             if (tbHandle)
                 handleValue = record[fieldName];
+            if (tbHandle === "TXTENTRYBAND")
+                handleValue = handleValue.replace(/M/g, '');
             // Append text box entry for N3FJP form
             fjpArray[k++] = "<CMD><UPDATE><CONTROL>" + tbHandle + "</CONTROL><VALUE>" + 
                 handleValue + "</VALUE></CMD>\r\n";

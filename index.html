@@ -21,10 +21,17 @@
   <head>
     <meta charset="UTF-8">
     <title>JS8CALL N1MM+(ADIF) messaging to N3FJP Bridge</title>
+    <link rel="stylesheet" href="js8fjp.css">
   </head>
   <body>
-    <div><textarea id="udpLog"></textarea></div>
-    <div><textarea id="tcpLog"></textarea></div>
+    <div>
+      <h4>UDP Log</h4>
+      <textarea class="taNetLog" id="udpLog"></textarea>
+    </div>
+    <div>
+      <h4>TCP Log</h4>
+      <textarea class="taNetLog" id="tcpLog"></textarea>
+    </div>
     <script>
       // You can also require other files to run in this process
       require('./index.js')
