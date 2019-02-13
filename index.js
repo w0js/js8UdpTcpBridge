@@ -21,9 +21,10 @@
 //var udpHost = '127.0.0.1';
 
 var dgram = require('dgram');
-var udpServer = dgram.createSocket('udp4');
+var udpServer;// = dgram.createSocket('udp4');
 var jquery = $ = require('jquery');
 
+/*
 udpServer.on('listening', function () {
     var address = udpServer.address();
     $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
@@ -53,6 +54,7 @@ udpServer.on('message', function (rcvdMessage, remote) {
     $("#udpLog").append("udpServer: sending - " + rigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
     $("#udpLog").scrollTop(999999);
 });
+*/
 
 // UDP Client - Testing Purposes (Substitute for JS8CALL)
 /*
@@ -85,7 +87,7 @@ var tcpServer = net.createServer(function(socket) {
 */
 
 // TCP Client
-var tcpClient = new net.Socket();
+var tcpClient; // = new net.Socket();
 
 /* Now handled in connectBtn.click
 tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
@@ -93,7 +95,7 @@ tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
 //	tcpClient.write('Hello, server! Love, Client.');
 });
 */
-
+/*
 tcpClient.on('data', function(data) {
 	$("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
 //	tcpClient.destroy(); // kill client after server's response
@@ -102,7 +104,7 @@ tcpClient.on('data', function(data) {
 tcpClient.on('close', function() {
 	$("#tcpLog").append('tcpClient: Connection closed');
 });
-
+*/
 // ADIF parsing function
 /* License Information from github.com/dskaggs/adif-parser
  * MIT license below is applicable as commented in following function
@@ -244,11 +246,63 @@ function adifToFjp(adifInput) {
 
 // Event handler for the Connect button
 $("#connectBtn").click( function() {
+    udpServer = dgram.createSocket('udp4');
     udpServer.bind($("#udpPort").text(), $("#udpIp").text()); // start udpServer
 
+    udpServer.on('listening', function () {
+        var address = udpServer.address();
+        $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
+        $("#udpLog").scrollTop(999999);
+    });
+    
+    udpServer.on('message', function (rcvdMessage, remote) {
+        var fjpEntryCmd = "<CMD><ACTION><VALUE>ENTER</VALUE></CMD>\r\n";
+        var ignRigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>TRUE</VALUE></CMD>\r\n";
+        var rigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>FALSE</VALUE></CMD>\r\n";
+        var udpRecString = "udpServer received: " + remote.address + ':' + remote.port + ' - ' +
+            rcvdMessage.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\r\n";
+        $("#udpLog").append(udpRecString);
+        var parsedMessage = adifToFjp(rcvdMessage.toString());
+        tcpClient.write(ignRigPollCmd);
+        $("#udpLog").append("udpServer: sending - " + ignRigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+        $("#udpLog").scrollTop(999999);
+        for( var element in parsedMessage) {
+            var messageToSend = new Buffer.from(parsedMessage[element]);
+            tcpClient.write(messageToSend);
+            $("#udpLog").append("udpServer: sending - " + messageToSend.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+            $("#udpLog").scrollTop(999999);
+        };
+        tcpClient.write(fjpEntryCmd);
+        $("#udpLog").scrollTop(999999);
+        tcpClient.write(rigPollCmd);
+        $("#udpLog").append("udpServer: sending - " + rigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
+        $("#udpLog").scrollTop(999999);
+    });
+
+    udpServer.on('close', function() {
+        $("#udpLog").append("udpServer: closed\r\n");
+    })
   
 //    tcpServer.listen($("#tcpPort").text(), $("#tcpIp").text()); // Start tcpServer - Testing Purposes (In place of N3FJP ACLOG)
+    tcpClient = new net.Socket();
     tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
         $("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n"); // Start tcpClient
     });
+
+    tcpClient.on('data', function(data) {
+        $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
+    //	tcpClient.destroy(); // kill client after server's response
+    });
+    
+    tcpClient.on('close', function() {
+        $("#tcpLog").append("tcpClient: Connection closed\r\n");
+    });
+});
+
+// Event handler for the Disconnect button
+$("#disconBtn").click( function() {
+    if (udpServer)
+        udpServer.close();
+    if (tcpClient.server !== null)
+        tcpClient.close();
 });

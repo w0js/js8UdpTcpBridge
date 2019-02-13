@@ -2,9 +2,21 @@
   "name": "js8UdpTcpBridge",
   "version": "0.1.0",
   "description": "N1MM+ UDP to N3FJP TCP ham radio logging bridge",
+  "author": "Jonathan Straub, W0JS",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "yarn compile && electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "build": {
+    "appId": "com.electron.js8UdpTcpBridge",
+    "nsis": {
+      "createDesktopShortcut": "always"
+    },
+    "linux": {
+      "category": "Ham Radio"
+    }
   },
   "repository": "https://github.com/w0js/js8UdpTcpBridge.git",
   "keywords": [
@@ -18,10 +30,10 @@
     "TCP",
     "UDP"
   ],
-  "author": "Jonathan Straub, W0JS",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "electron": "^4.0.3"
+    "electron": "^4.0.3",
+    "electron-builder": "^20.38.5"
   },
   "dependencies": {
     "jquery": "^3.3.1"
