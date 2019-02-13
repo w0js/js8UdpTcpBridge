@@ -8,7 +8,14 @@ npm start
 ```
 
 ## Deployment
-Have not yet performed a build of this app.
+Using [electron-builder](https://www.electron.build/) to package the app. They recommend using [yarn](https://yarnpkg.com/en/) rather than npm.
+Once both are installed per the websites, perform one of the following commands:
+
+To install for Windows:
+```yarn dist -w```
+
+To install for linux:
+```yarn dist -l```
 
 ## Contributing
 Have not yet decided on contribution requirements.
