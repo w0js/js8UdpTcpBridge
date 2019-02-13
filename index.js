@@ -152,6 +152,10 @@ function adifToFjp(adifInput) {
     var handleValue;
     var k = 0;
 
+    String.prototype.splice = function(idx, rem, str) {
+        return this.slice(0, idx) + str + this.slice(idx + Math.abs(rem));
+    };
+
     for (fieldName in record) {
         // We do not want command an tx_pwr entries to be sent
         if (fieldName !== "command" && fieldName !== "tx_pwr") {
@@ -234,6 +238,17 @@ function adifToFjp(adifInput) {
                 handleValue = record[fieldName];
             if (tbHandle === "TXTENTRYBAND")
                 handleValue = handleValue.replace(/M/g, '');
+            // if Time entry, add colons as time separators
+            if (tbHandle === "TXTENTRYTIMEON" || tbHandle === "TXTENTRYTIMEOFF") {
+                handleValue = handleValue.splice(2, 0, ':');
+                handleValue = handleValue.splice(5, 0, ':');
+            }
+            // if Date entry, add slashes as date separators
+            if (tbHandle === "TXTENTRYDATE") {
+                handleValue = handleValue.splice(4, 0, '/');
+                handleValue = handleValue.splice(7, 0, '/');
+            }
+                
             // Append text box entry for N3FJP form
             fjpArray[k++] = "<CMD><UPDATE><CONTROL>" + tbHandle + "</CONTROL><VALUE>" + 
                 handleValue + "</VALUE></CMD>\r\n";
@@ -287,15 +302,18 @@ $("#connectBtn").click( function() {
     tcpClient = new net.Socket();
     tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
         $("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n"); // Start tcpClient
+        $("#tcpLog").scrollTop(999999);
     });
 
     tcpClient.on('data', function(data) {
-        $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
+        $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer\r\n");
+        $("#tcpLog").scrollTop(999999);
     //	tcpClient.destroy(); // kill client after server's response
     });
     
     tcpClient.on('close', function() {
         $("#tcpLog").append("tcpClient: Connection closed\r\n");
+        $("#tcpLog").scrollTop(999999);
     });
 });
 
