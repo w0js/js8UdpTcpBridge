@@ -17,49 +17,13 @@
 */
 
 // UDP server
-//var udpPort = 2333;
-//var udpHost = '127.0.0.1';
-
 var dgram = require('dgram');
 var udpServer;// = dgram.createSocket('udp4');
 var jquery = $ = require('jquery');
 
-/* Now handled in connectBtn.click
-udpServer.on('listening', function () {
-    var address = udpServer.address();
-    $("#udpLog").append('udpServer: listening on ' + address.address + ':' + address.port + "\r\n");
-    $("#udpLog").scrollTop(999999);
-});
-*/
-/* Now handled in connectBtn.click
-udpServer.on('message', function (rcvdMessage, remote) {
-    var fjpEntryCmd = "<CMD><ACTION><VALUE>ENTER</VALUE></CMD>\r\n";
-    var ignRigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>TRUE</VALUE></CMD>\r\n";
-    var rigPollCmd = "<CMD><IGNORERIGPOLLS><VALUE>FALSE</VALUE></CMD>\r\n";
-    var udpRecString = "udpServer received: " + remote.address + ':' + remote.port + ' - ' +
-        rcvdMessage.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\r\n";
-    $("#udpLog").append(udpRecString);
-    var parsedMessage = adifToFjp(rcvdMessage.toString());
-    tcpClient.write(ignRigPollCmd);
-    $("#udpLog").append("udpServer: sending - " + ignRigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-    $("#udpLog").scrollTop(999999);
-    for( var element in parsedMessage) {
-        var messageToSend = new Buffer.from(parsedMessage[element]);
-        tcpClient.write(messageToSend);
-        $("#udpLog").append("udpServer: sending - " + messageToSend.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-        $("#udpLog").scrollTop(999999);
-    };
-    tcpClient.write(fjpEntryCmd);
-    $("#udpLog").scrollTop(999999);
-    tcpClient.write(rigPollCmd);
-    $("#udpLog").append("udpServer: sending - " + rigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
-    $("#udpLog").scrollTop(999999);
-});
-*/
-
 // UDP Client - Testing Purposes (Substitute for JS8CALL)
 /*
-var js8String = "<command:3>Log <parameters:166><Band:3>20M <Call:6>KC0NPL <Freq:6>14.078 <Mode:3>JS8 <QSO_DATE:8>20020422 <Time_ON:6>051500 <Time_OFF:6>055100 <RST_Rcvd:3>-17 <RST_Sent:3>-24 <TX_PWR:4>50.0 <EOR>";
+var js8String = "<command:3>Log <parameters:181><Band:3>20M <Call:6>KC0NPL <Freq:6>14.078 <gridsquare:6>EN17KW <Mode:3>JS8 <QSO_DATE:8>20020422 <Time_ON:6>051500 <Time_OFF:6>055100 <RST_Rcvd:3>-17 <RST_Sent:3>-24 <TX_PWR:4>50.0 <EOR>";
 var message = new Buffer.from(js8String);
 
 var udpClient = dgram.createSocket('udp4');
@@ -73,40 +37,19 @@ $("#udpSendBtn").click( function() {
 });
 */
 
+
 // TCP Section
 var net = require('net');
 
 // TCP server - Testing Purposes (Substitute for N3FJP ACLOG)
 /*
-//var tcpPort = 1100;
-//var tcpHost = '127.0.0.1';
-
 var tcpServer = net.createServer(function(socket) {
-//	socket.write('Echo server\r\n');
     socket.pipe(socket);
 });
 */
 
 // TCP Client
 var tcpClient; // = new net.Socket();
-
-/* Now handled in connectBtn.click
-tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
-	$("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n");
-//	tcpClient.write('Hello, server! Love, Client.');
-});
-*/
-/* Now handled in connectBtn.click
-tcpClient.on('data', function(data) {
-	$("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer");
-//	tcpClient.destroy(); // kill client after server's response
-});
-*/
-/* Now handled in connectBtn.click
-tcpClient.on('close', function() {
-	$("#tcpLog").append('tcpClient: Connection closed');
-});
-*/
 
 
 // ADIF parsing function
@@ -252,12 +195,16 @@ function adifToFjp(adifInput) {
                 handleValue = handleValue.splice(4, 0, '/');
                 handleValue = handleValue.splice(7, 0, '/');
             }
+            
+            if (tbHandle !== "") {
+                // Append text box entry for N3FJP form
+                fjpArray[k++] = "<CMD><UPDATE><CONTROL>" + tbHandle + "</CONTROL><VALUE>" + 
+                    handleValue + "</VALUE></CMD>\r\n";
                 
-            // Append text box entry for N3FJP form
-            fjpArray[k++] = "<CMD><UPDATE><CONTROL>" + tbHandle + "</CONTROL><VALUE>" + 
-                handleValue + "</VALUE></CMD>\r\n";
-            // Append CALLTAB function after each command for full-feature N3FJP operation
-            fjpArray[k++] = "<CMD><ACTION><VALUE>CALLTAB</VALUE></CMD>\r\n";
+                if (tbHandle === "TXTENTRYCALL")
+                    // Append CALLTAB function after submitting callsign for N3FJP lookup info
+                    fjpArray[k++] = "<CMD><ACTION><VALUE>CALLTAB</VALUE></CMD>\r\n";
+            }
         }
     };
     return fjpArray;
@@ -302,7 +249,7 @@ $("#connectBtn").click( function() {
         $("#udpLog").append("udpServer: closed\r\n");
     })
   
-//    tcpServer.listen($("#tcpPort").text(), $("#tcpIp").text()); // Start tcpServer - Testing Purposes (In place of N3FJP ACLOG)
+    //tcpServer.listen($("#tcpPort").text(), $("#tcpIp").text()); // Start tcpServer - Testing Purposes (In place of N3FJP ACLOG)
     tcpClient = new net.Socket();
     tcpClient.connect($("#tcpPort").text(), $("#tcpIp").text(), function() {
         $("#tcpLog").append('tcpClient: Connected to ' + $("#tcpIp").text() + ':' + $("#tcpPort").text() + "\r\n"); // Start tcpClient
@@ -312,7 +259,6 @@ $("#connectBtn").click( function() {
     tcpClient.on('data', function(data) {
         $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer\r\n");
         $("#tcpLog").scrollTop(999999);
-    //	tcpClient.destroy(); // kill client after server's response
     });
     
     tcpClient.on('close', function() {
