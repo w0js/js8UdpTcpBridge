@@ -239,6 +239,7 @@ $("#connectBtn").click( function() {
             $("#udpLog").scrollTop(999999);
         };
         tcpClient.write(fjpEntryCmd);
+        $("#udpLog").append("udpServer: sending - " + fjpEntryCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
         $("#udpLog").scrollTop(999999);
         tcpClient.write(rigPollCmd);
         $("#udpLog").append("udpServer: sending - " + rigPollCmd.replace(/</g, "&lt;").replace(/>/g, "&gt;"));
@@ -257,7 +258,7 @@ $("#connectBtn").click( function() {
     });
 
     tcpClient.on('data', function(data) {
-        $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;") + "\" from tcpServer\r\n");
+        $("#tcpLog").append('tcpClient Received: \"' + data.toString().replace(/</g, "&lt;").replace(/>/g, "&gt;").replace("\r\n", "") + "\" from tcpServer\r\n");
         $("#tcpLog").scrollTop(999999);
     });
     
