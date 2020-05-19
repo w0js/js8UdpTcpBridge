@@ -22,7 +22,9 @@ Have not yet decided on contribution requirements.
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/w0js/js8UdpTcpBridge/releases). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/w0js/js8UdpTcpBridge/releases).
+
+Changelog can be viewed [here.](./changelog.md)
 
 ## Authors
 
